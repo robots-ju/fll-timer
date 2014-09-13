@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="author" content="Clark Winkelmann">
+	<meta name="generator" content="Bluefish 2.2.5">
+	<title>FLL Timer</title>
+<style type="text/css">
+
+*{
+	margin: 0;
+	padding: 0;
+}
+
+body{
+	overflow: hidden;
+}
+
+#box{
+	position: absolute;
+	top: 50%;
+	left: 0;
+	width: 100%;
+	height: 650px;
+	margin-top: -345px;
+	background: #FEBE29;
+	padding-top: 40px;
+}
+
+#time{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 0;
+	height: 0;
+}
+
+.number{
+	background: url(7segments.svg);
+	background-size: 3000px;
+	background-repeat: no-repeat;
+	background-position: 0;
+	width: 297px;
+	height: 600px;
+	margin-top: -300px;
+	position: absolute;
+	top: 50%;
+	left: -820px;
+}
+
+.number.red{
+	background: url(7segmentsred.svg);
+	background-size: 3000px;
+	background-repeat: no-repeat;
+	background-position: 0;
+}
+
+#min1{
+	left: -500px;
+}
+#s10{
+	left: 20px;
+}
+#s1{
+	left: 340px;
+}
+
+.point{
+	width: 50px;
+	height: 50px;
+	margin-left: -25px;
+	position: absolute;
+	top: -150px;
+	left: -100px;
+	background: #FFF;
+}
+
+.point.red{
+	background: #F00;
+}
+
+.point:last-child{
+	top: 150px;
+}
+
+.bouton{
+	width: 150px;
+	height: 30px;
+	background: #FEBE29;
+	position: absolute;
+	bottom: 25px;
+	right: 480px;
+	color: #FFF;
+	font-family: Arial, sans-serif;
+	font-weight: bold;
+	font-size: 20px;
+	text-align: center;
+	padding-top: 10px;
+}
+
+.bouton:hover{
+	cursor: pointer;
+}
+
+#reset{
+	right: 300px;
+}
+
+#start{
+	right: 120px;
+}
+
+#popup{
+	width: 600px;
+	height: 400px;
+	background: #DDD;
+	border-radius: 10px;
+	margin-left: -300px;
+	position: absolute;
+	top: 200px;
+	left: 50%;
+	z-index: 100;
+	display: none;
+}
+
+#popup h1{
+	font-family: Arial, sans-serif;
+	font-weight: bold;
+	font-size: 35px;
+	text-align: center;
+	margin-top: 50px;
+	margin-bottom: 60px;
+	color: #FEBE29;
+}
+
+#popup p, #popup input{
+	font-family: Arial, sans-serif;
+	font-weight: bold;
+	font-size: 30px;
+	text-align: center;
+}
+
+#popup input{
+	width: 100px;
+}
+
+#valider{
+	width: 200px !IMPORTANT;
+	text-align: center;
+	margin: 70px auto;
+	display: block;
+}
+
+</style>
+</head>
+<body>
+	<div id="box">
+		<div id="time">
+			<div id="min10" class="number"></div>
+			<div id="min1" class="number"></div>
+			<div id="s10" class="number"></div>
+			<div id="s1" class="number"></div>
+			<div class="point" id="point1"></div>
+			<div class="point" id="point2"></div>
+		</div>
+	</div>
+	<div class="bouton" onclick="Perso()">PERSO</div>
+	<div class="bouton" onclick="Reset()" id="reset">RESET</div>
+	<div class="bouton" onclick="Start()" id="start">START</div>
+	<div id="popup">
+		<h1>TIMER PERSO</h1>
+		<p><input type="text" id="minutes" value="2"/>&nbsp;:&nbsp;<input type="text" id="secondes" value="30"/></p>
+		<input type="button" value="Valider" id="valider" onclick="Valider()"/>
+	</div>
+<script type="text/javascript" >
+
+var Minutes = 2;
+var Secondes = 30;
+var MinutesStart = 2;
+var SecondesStart = 30;
+var ON = false;
+
+function Start(){
+	if(ON){
+		ON = false;
+		clearInterval(timer);
+		document.getElementById('start').innerHTML = 'START';
+	}else{
+		ON = true;
+		Boucle();
+		timer = setInterval('Boucle()',1000);
+		document.getElementById('start').innerHTML = 'PAUSE';
+	}
+}
+
+function Reset(){
+	if(ON){
+		clearInterval(timer);
+		document.getElementById('start').innerHTML = 'START';
+	}
+	Minutes = MinutesStart;
+	Secondes = SecondesStart;
+	Display();
+}
+
+function Display(){
+	if(Minutes == 0 && Secondes <= 10){
+		document.getElementById('min1').className = 'number red';
+		document.getElementById('min10').className = 'number red';
+		document.getElementById('s1').className = 'number red';
+		document.getElementById('s10').className = 'number red';
+		document.getElementById('point1').className = 'point red';
+		document.getElementById('point2').className = 'point red';
+	}else{
+		document.getElementById('min1').className = 'number';
+		document.getElementById('min10').className = 'number';
+		document.getElementById('s1').className = 'number';
+		document.getElementById('s10').className = 'number';
+		document.getElementById('point1').className = 'point';
+		document.getElementById('point2').className = 'point';
+	}
+	document.getElementById('min1').style.backgroundPosition = '-' + (Minutes-(Math.floor(Minutes/10)*10))*300-2 + 'px';
+	document.getElementById('min10').style.backgroundPosition = '-' + (Math.floor(Minutes/10))*300-2 + 'px';
+	document.getElementById('s1').style.backgroundPosition = '-' + (Secondes-(Math.floor(Secondes/10)*10))*300-2 + 'px';
+	document.getElementById('s10').style.backgroundPosition = '-' + (Math.floor(Secondes/10))*300-2 + 'px';
+	if(Minutes < 10){
+		document.getElementById('time').style.width = '1650px';
+		document.getElementById('min10').style.display = 'none';
+	}else{
+		document.getElementById('time').style.width = '1350px';
+		document.getElementById('min10').style.display = 'block';
+	}
+}
+Display();
+
+function Boucle(){
+	Display();
+	if(Minutes <= 0 && Secondes <= 0){
+		clearInterval(timer);
+	}else{
+		if(Secondes <= 0){
+			Secondes = 59;
+			Minutes -= 1;
+		}else{
+			Secondes--;
+		}
+	}
+}
+
+function Perso(){
+	document.getElementById('popup').style.display = 'block';
+}
+
+function Valider(){
+	document.getElementById('popup').style.display = 'none';
+	MinutesStart = parseInt(document.getElementById('minutes').value);
+	SecondesStart = parseInt(document.getElementById('secondes').value);
+	Reset();
+}
+
+document.onkeydown = function(e) {
+	var key = e.keyCode;
+	// SPACE OR ESC
+	if(key == 32 || key == 27) {
+		Start();
+	}
+	// R
+	if(key == 82){
+		Reset();
+	}
+	// P
+	if(key == 80){
+		Perso();
+	}
+};
+
+</script>
+</body>
+</html>
