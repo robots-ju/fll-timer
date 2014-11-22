@@ -1,0 +1,2 @@
+# Serve the cache manifest with the correct MIME type
+AddType text/cache-manifest .appcache
